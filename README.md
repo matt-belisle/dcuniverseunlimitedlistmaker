@@ -4,7 +4,7 @@ The goal of this application is to be able to easily share, import, and export l
 
 ## Planned features / Where they are implemented
 
-### Front-End (src / Front-End)
+### Front-End (front-end/)
 
 - [] Importing a list
 - [] Exporting a list
@@ -13,7 +13,7 @@ The goal of this application is to be able to easily share, import, and export l
 - [] Login functionality
 - [] Comic browser ( ideally easily filterable )
 
-### Back-End (src / Back-End)
+### Back-End (back-end/)
 
 - [] Get all / update DB script that can be ran nightly 
 - [] Necessary API calls for front end to work (likely move API to separate project and import as library)
