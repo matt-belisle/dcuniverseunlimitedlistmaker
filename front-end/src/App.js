@@ -1,11 +1,10 @@
-import './App.css';
-import ComicGrid from './ComicGrid.tsx'
+import "./App.css";
+import ComicGrid from "./Components/ComicGrid.tsx";
 
 function App() {
   return (
     <div className="App">
-
-        <ComicGrid />
+      <ComicGrid />
     </div>
   );
 }

@@ -18,3 +18,16 @@
 .App-link {
   color: #61dafb;
 } */
+
+
+.CellExpander {
+  float: right;
+  display: table;
+  height: 100%;
+  
+}
+.CellExpander > span {
+  display: table-cell;
+  vertical-align: middle;
+  cursor: pointer;
+}
