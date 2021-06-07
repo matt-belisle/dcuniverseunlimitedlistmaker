@@ -3,7 +3,9 @@ export interface Comic {
   requested?: string;
   readonly SeriesName: string;
   readonly SeriesUUID: string;
-  readonly IssueNumber: number | null;
+  readonly IssueNumber?: number;
+  //All comics from backend should come with a UUID
+  readonly UUID?: string;
   readonly Authors: string[];
   readonly Colorists: string[];
   readonly CoverArtists: string[];
@@ -31,16 +33,20 @@ export interface ComicRow extends Comic {
 
 //     children: ComicRow[];
 // }
-
+function rand(): string {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
+}
 export function createTestRows(): ComicRow[] {
   const rows: ComicRow[] = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 4; i++) {
     const row: ComicRow = {
       isSelected: false,
       isExpanded: false,
       SeriesName: "",
       SeriesUUID: "",
-      IssueNumber: null,
       requested: `requested-${i}`,
       Authors: [],
       Colorists: [],
@@ -54,11 +60,11 @@ export function createTestRows(): ComicRow[] {
       ReleaseDate: "",
       children: [
         {
-          requested: `requested-${i}`,
           isSelected: false,
           isExpanded: false,
           SeriesName: "Batman",
           SeriesUUID: "batman",
+          UUID: rand(),
           IssueNumber: 1,
           Authors: ["author1", "author2"],
           Colorists: ["colorist"],
@@ -75,5 +81,87 @@ export function createTestRows(): ComicRow[] {
     };
     rows.push(row);
   }
+  const row: ComicRow = {
+    isSelected: false,
+    isExpanded: false,
+    SeriesName: "",
+    SeriesUUID: "",
+    requested: `requested-11`,
+    Authors: [],
+    Colorists: [],
+    CoverArtists: [],
+    Inkers: [],
+    Pencillers: [],
+    Era: "",
+    Imprint: "",
+    Description: "",
+    CharacterTags: [],
+    ReleaseDate: "",
+    children: [
+      {
+        isSelected: false,
+        isExpanded: false,
+        SeriesName: "Batman",
+        SeriesUUID: "batman",
+        IssueNumber: 1,
+        UUID: rand(),
+        Authors: ["author1", "author2"],
+        Colorists: ["colorist"],
+        CoverArtists: ["coverArtist"],
+        Inkers: ["Inker"],
+        Pencillers: ["Penciller"],
+        Era: "golden age",
+        Imprint: "DC",
+        Description: "description",
+        CharacterTags: ["Batman", "Robin"],
+        ReleaseDate: "1915",
+      },
+      {
+        isSelected: false,
+        isExpanded: false,
+        SeriesName: "Superman",
+        SeriesUUID: "batman",
+        IssueNumber: 1,
+        Authors: ["author1", "author2"],
+        Colorists: ["colorist"],
+        UUID: rand(),
+        CoverArtists: ["coverArtist"],
+        Inkers: ["Inker"],
+        Pencillers: ["Penciller"],
+        Era: "golden age",
+        Imprint: "DC",
+        Description: "description",
+        CharacterTags: ["Batman", "Robin"],
+        ReleaseDate: "1915",
+      },
+    ],
+  };
+  rows.push(row);
   return rows;
+}
+
+export function baseComicRow(
+  requested: string | undefined,
+  isSelected: boolean,
+  isExpanded: boolean,
+  children: ComicRow[]
+): ComicRow {
+  return {
+    isSelected: isSelected,
+    isExpanded: isExpanded,
+    SeriesName: "",
+    SeriesUUID: "",
+    requested: requested,
+    Authors: [],
+    Colorists: [],
+    CoverArtists: [],
+    Inkers: [],
+    Pencillers: [],
+    Era: "",
+    Imprint: "",
+    Description: "",
+    CharacterTags: [],
+    ReleaseDate: "",
+    children: children,
+  };
 }
