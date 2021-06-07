@@ -199,7 +199,31 @@ export default function ComicGrid() {
       {
         key: "SeriesName",
         name: "Series",
+        formatter({ row, isCellSelected }) {
+          const actions = [
+            {
+              icon: "❓",
+              callback() {
+                alert("Information not implemented yet");
+              },
+            },
+          ];
+          const needsInfo = row.children === undefined || row.children.length === 1
+          const style = needsInfo ? { marginLeft: 30 } : undefined;
+
+          return (
+            <>
+            <div className='formatterContainer'>
+              {needsInfo && (
+                <CellActionsFormatter actions={actions} />
+              )}
+            </div>
+            <div style={style}>{row.SeriesName}</div>
+            </>
+          );
+        },
       },
+
       {
         key: "ReleaseDate",
         name: "Release Date",
