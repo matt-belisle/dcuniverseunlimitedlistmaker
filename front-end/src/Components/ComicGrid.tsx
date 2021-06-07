@@ -10,17 +10,7 @@ interface Action {
   type: "toggleSubRow" | "selectSubRow";
   identifier: string;
 }
-// eslint-disable-next-line
-function StringArrayFormatter({ arr }: { arr: string[] }) {
-  return <>{arr.join(", ")}</>;
-}
-/*         
-To use
-// formatter(props) {
-                //   return <StringArrayFormatter arr={props.row.Authors} />
-                // }
 
-*/
 
 function toggleSubRow(rows: ComicRow[], requested: string): ComicRow[] {
   const rowIndex = rows.findIndex((r) => r.requested === requested);
@@ -61,20 +51,7 @@ function selectSubRow(rows: ComicRow[], UUID: string): ComicRow[] {
   return remapParents(newRows);
 }
 
-//identifier is just something that can uniquely determine the row,
-//for parents this is the requested, for children, which are from DB,
-//this is the UUID
-function reducer(rows: ComicRow[], { type, identifier }: Action): ComicRow[] {
-  switch (type) {
-    case "toggleSubRow":
-      return toggleSubRow(rows, identifier);
-    case "selectSubRow":
-      console.log("Here");
-      return selectSubRow(rows, identifier);
-    default:
-      return rows;
-  }
-}
+
 //note this is not a pure function, so it should not take anything currently in the state.
 function remapParents(rows: ComicRow[]): ComicRow[] {
   return rows.map((row: ComicRow) => {
@@ -111,10 +88,24 @@ function remapParents(rows: ComicRow[]): ComicRow[] {
   });
 }
 
+//identifier is just something that can uniquely determine the row,
+//for parents this is the requested, for children, which are from DB,
+//this is the UUID
+function reducer(rows: ComicRow[], { type, identifier }: Action): ComicRow[] {
+  switch (type) {
+    case "toggleSubRow":
+      return toggleSubRow(rows, identifier);
+    case "selectSubRow":
+      console.log("Here");
+      return selectSubRow(rows, identifier);
+    default:
+      return rows;
+  }
+}
+
 const defaultRows = createTestRows();
 
 export default function ComicGrid() {
-  //Note: in mapped rows, only mutate the children, this will update the parent based on the children if necessary
   const mappedRows = remapParents(defaultRows);
 
   const [rows, dispatch] = useReducer(reducer, mappedRows);
