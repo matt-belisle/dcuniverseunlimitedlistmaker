@@ -1,11 +1,13 @@
-import { useMemo, useReducer } from "react";
+import { useMemo, useReducer, useState } from "react";
 import DataGrid from "react-data-grid";
-import { ComicRow, createTestRows, baseComicRow } from "./Comic";
+import { ComicRow, createTestRows, baseComicRow, Comic } from "./Comic";
 import { CellExpanderFormatter } from "./Formatters/CellExpanderFormatter";
 import { CellActionsFormatter } from "./Formatters/CellActionsFormatter";
 import type { Column } from "react-data-grid";
 //necessary to make things pure for the reducer, was running into issues without this
 import { cloneDeep } from "lodash";
+import Popup from "./Popup";
+import ComicInformation from "./ComicInformation";
 interface Action {
   type: "toggleSubRow" | "selectSubRow";
   identifier: string;
@@ -29,8 +31,13 @@ function toggleSubRow(rows: ComicRow[], requested: string): ComicRow[] {
   return newRows;
 }
 
+const findUUID = (rows: ComicRow[], UUID: string) =>  rows.reduce((acc: number[], el: ComicRow, i: number) => (el.UUID === UUID ? [...acc, i] : acc), []); 
+
 function selectSubRow(rows: ComicRow[], UUID: string): ComicRow[] {
-  const rowIndex = rows.findIndex((r) => r.UUID === UUID);
+  const rowsIndex = findUUID(rows, UUID);
+  //doing it like this allows the parent to contain a uuid, this will get the last element in the grid with the UUID
+  //which is the selected subrow
+  const rowIndex = rowsIndex[rowsIndex.length - 1];
   let curr = rows[rowIndex].isSelected;
   const newRows = cloneDeep(rows);
   newRows[rowIndex].isSelected = !curr;
@@ -60,9 +67,7 @@ function remapParents(rows: ComicRow[]): ComicRow[] {
         return {
           requested: row.requested,
           children: row.children,
-          //keeps uuid unique to the child for searching
           ...row.children[0],
-          UUID: undefined,
         };
       }
       //if one of the children is selected we should display that on the parent row
@@ -71,9 +76,7 @@ function remapParents(rows: ComicRow[]): ComicRow[] {
         return {
           requested: row.requested,
           children: row.children,
-          //keeps uuid unique to the child for searching,
           ...selected,
-          UUID: undefined,
         };
       } else {
         return baseComicRow(
@@ -99,6 +102,7 @@ function reducer(rows: ComicRow[], { type, identifier }: Action): ComicRow[] {
       console.log("Here");
       return selectSubRow(rows, identifier);
     default:
+      throw new Error(`You screwed up: ${type} is not an action in the reducer`)
       return rows;
   }
 }
@@ -109,6 +113,12 @@ export default function ComicGrid() {
   const mappedRows = remapParents(defaultRows);
 
   const [rows, dispatch] = useReducer(reducer, mappedRows);
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const [infoComic, setInfoComic] = useState<ComicRow>(baseComicRow("", false, false, []))
+
+  const comicInformation = <ComicInformation comic={infoComic} />
 
   const columns: Column<ComicRow>[] = useMemo(() => {
     return [
@@ -128,7 +138,6 @@ export default function ComicGrid() {
           const isParent = row.requested !== undefined;
           if (isParent) {
             if (hasChildren) {
-              //TODO add browse here
               const actions = [
                 {
                   icon: "🔍",
@@ -195,7 +204,11 @@ export default function ComicGrid() {
             {
               icon: "❓",
               callback() {
-                alert("Information not implemented yet");
+                if(row.children !== undefined){
+
+                }
+                setInfoComic(row);
+                setIsOpen(true);
               },
             },
           ];
@@ -214,14 +227,13 @@ export default function ComicGrid() {
           );
         },
       },
-
-      {
-        key: "ReleaseDate",
-        name: "Release Date",
-      },
       {
         key: "IssueNumber",
         name: "Issue Number",
+      },
+      {
+        key: "ReleaseDate",
+        name: "Release Date",
       },
     ];
   }, []);
@@ -229,6 +241,8 @@ export default function ComicGrid() {
   return (
     <div>
       <DataGrid columns={columns} rows={rows} />
+      {isOpen && <Popup content={comicInformation} handleClose={() => setIsOpen(false)} />}
+
     </div>
   );
 }
