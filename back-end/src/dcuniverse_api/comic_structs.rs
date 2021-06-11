@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-trait QueryInfoTrait {
+pub trait QueryInfoTrait<L> {
     fn query_info(&self) -> QueryInfo;
+
+    fn get_items(&self) -> Vec<L>;
 }
 
 #[derive(Serialize, Deserialize)]
@@ -11,9 +13,13 @@ pub struct JSONSearchSeries {
     pub info: InfoSeriesSearch,
 }
 
-impl QueryInfoTrait for JSONSearchSeries {
+impl QueryInfoTrait<ComicSeries> for JSONSearchSeries {
     fn query_info(&self) -> QueryInfo {
         self.info.comicseries.clone()
+    }
+
+    fn get_items(&self) -> Vec<ComicSeries> {
+        self.records.comicseries.clone()
     }
 }
 
@@ -24,9 +30,13 @@ pub struct JSONSearchComic {
     pub info: InfoBookSearch,
 }
 
-impl QueryInfoTrait for JSONSearchComic {
+impl QueryInfoTrait<Comic> for JSONSearchComic {
     fn query_info(&self) -> QueryInfo {
         self.info.book.clone()
+    }
+
+    fn get_items(&self) -> Vec<Comic> {
+        self.records.book.clone()
     }
 }
 
@@ -58,7 +68,7 @@ pub struct ComicSeriesRecords {
 pub struct ComicRecords {
     pub book: Vec<Comic>,
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Comic {
     pub inkers: Option<Vec<String>>,    
     pub uuid: String,
@@ -74,7 +84,7 @@ pub struct Comic {
     pub series_index: i32,
     pub description: String,
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ComicSeries {
     pub books_count: i32,
     pub title: String,
