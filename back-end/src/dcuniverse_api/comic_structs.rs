@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Utc};
+
 
 pub trait QueryInfoTrait<L> {
     fn query_info(&self) -> QueryInfo;
@@ -83,6 +85,10 @@ pub struct Comic {
     pub issue_number: String,
     pub series_index: i32,
     pub description: String,
+
+    //this will be used to determine whether or not we need to worry about an issue
+    #[serde(with = "date_serde")]
+    pub updated_at: DateTime<Utc>
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ComicSeries {
@@ -91,4 +97,35 @@ pub struct ComicSeries {
     pub uuid: String,
 }
 
+
+
+
+
+mod date_serde {
+    use chrono::prelude::*;
+    use serde::{self, Deserialize, Serializer, Deserializer};
+
+    const FORMAT: &str = "%+";
+
+    pub fn serialize<S>(
+        date: &DateTime<Utc>,
+        serializer: S
+    ) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+    let s = format!("{}", date.format(FORMAT));
+    serializer.serialize_str(&s)
+    }
+
+    pub fn deserialize<'de, D>(
+        deserializer: D,
+    ) -> Result<DateTime<Utc>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
+    }
+}
 

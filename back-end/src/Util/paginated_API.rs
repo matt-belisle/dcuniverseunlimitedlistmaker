@@ -1,1 +1,0 @@
-//will be an iterator for any paginated api given a reqwest client and a base url and a body creation function
